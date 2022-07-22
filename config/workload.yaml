@@ -1,0 +1,42 @@
+apiVersion: carto.run/v1alpha1
+kind: Workload
+metadata:
+  name: hello-world
+  namespace: dev-ns
+  labels:
+    app.kubernetes.io/part-of: hello-world
+    apps.tanzu.vmware.com/workload-type: web
+spec:
+  env:
+  - name: JAVA_TOOL_OPTIONS
+    value: "-Dsrvenv=local"
+  - name: DB_URL
+    valueFrom:
+      secretKeyRef:
+        name: app-secret
+        key: DB_URL
+  - name: DB_USERNAME
+    valueFrom:
+      secretKeyRef:
+        name: app-secret
+        key: DB_USERNAME
+  - name: DB_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: app-secret
+        key: DB_PASSWORD
+  params:
+  - name: gitops_ssh_secret
+    value: git-ssh-devops
+  - name: annotations
+    value:
+      autoscaling.knative.dev/minScale: "1"
+  build:
+    env:
+    - name: BP_MAVEN_BUILD_ARGUMENTS
+      value: "clean install -Dmaven.test.skip=true -DmavenAntrunPlugin=true -Denv.bamboo_build_working_directory=. -Denv.bamboo_skipCleanTarget"
+  source:
+    git:
+      url: https://git-codecommit.us-east-2.amazonaws.com/v1/repos/tap
+      ref:
+        branch: master
