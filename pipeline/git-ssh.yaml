@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: git-ssh-devops
+  namespace: dev-ns
+  annotations:
+    tekton.dev/git-0: https://git-codecommit.us-east-2.amazonaws.com
+type: kubernetes.io/basic-auth
+stringData:
+  username: chevured-at-900919292663
+  password: 1a3RdmLloDYVwf5E6mmb9UztHb82zq1srQ66ENq0IdQ=
