@@ -2,11 +2,21 @@ apiVersion: carto.run/v1alpha1
 kind: Workload
 metadata:
   name: hello-world
-  namespace: dev-ns
+  namespace: qa-ns
   labels:
     app.kubernetes.io/part-of: hello-world
     apps.tanzu.vmware.com/workload-type: web
 spec:
+  template:
+    metadata:
+      annotations:
+        vault.hashicorp.com/agent-inject: 'true'
+        vault.hashicorp.com/role: 'internal-app'
+        vault.hashicorp.com/agent-inject-secret-database-config.txt: 'internal/data/database/config'
+        vault.hashicorp.com/agent-inject-template-database-config.txt: |
+          {{- with secret "internal/data/database/config" -}}
+          postgresql://{{ .Data.data.username }}:{{ .Data.data.password }}@postgres:5432/wizard
+          {{- end -}}
   env:
   - name: JAVA_TOOL_OPTIONS
     value: "-Dsrvenv=local"
